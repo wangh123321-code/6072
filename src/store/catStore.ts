@@ -18,26 +18,37 @@ interface CatState {
   deleteCat: (id: string) => Promise<void>;
   setCurrentCat: (id: string) => void;
   initializeData: () => Promise<void>;
+  refreshCurrentCat: () => void;
 }
+
+const getCurrentCatFromState = (state: Partial<CatState>): Cat | null => {
+  if (!state.cats || !state.currentCatId) return null;
+  return state.cats.find((c) => c.id === state.currentCatId) || null;
+};
 
 export const useCatStore = create<CatState>((set, get) => ({
   cats: [],
   currentCatId: null,
-  get currentCat() {
-    const state = get();
-    return state.cats.find((c) => c.id === state.currentCatId) || null;
-  },
+  currentCat: null,
   isLoading: false,
   error: null,
   isInitialized: false,
+
+  refreshCurrentCat: () => {
+    const state = get();
+    set({ currentCat: getCurrentCatFromState(state) });
+  },
 
   fetchCats: async () => {
     set({ isLoading: true, error: null });
     try {
       const cats = await catRepository.getAll();
+      const currentCatId = cats.length > 0 ? cats[0].id : null;
+      const currentCat = cats.find((c) => c.id === currentCatId) || null;
       set({ 
         cats, 
-        currentCatId: cats.length > 0 ? cats[0].id : null,
+        currentCatId,
+        currentCat,
         isLoading: false 
       });
     } catch (error) {
@@ -50,11 +61,15 @@ export const useCatStore = create<CatState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const newCat = await catRepository.add(cat);
-      set((state) => ({
-        cats: [...state.cats, newCat],
-        currentCatId: newCat.id,
-        isLoading: false,
-      }));
+      set((state) => {
+        const newCats = [...state.cats, newCat];
+        return {
+          cats: newCats,
+          currentCatId: newCat.id,
+          currentCat: newCat,
+          isLoading: false,
+        };
+      });
     } catch (error) {
       logError(error, 'addCat');
       set({ error: '添加猫咪失败', isLoading: false });
@@ -66,10 +81,15 @@ export const useCatStore = create<CatState>((set, get) => ({
     try {
       const updated = await catRepository.update(id, data);
       if (updated) {
-        set((state) => ({
-          cats: state.cats.map((c) => (c.id === id ? updated : c)),
-          isLoading: false,
-        }));
+        set((state) => {
+          const newCats = state.cats.map((c) => (c.id === id ? updated : c));
+          const newCurrentCat = state.currentCatId === id ? updated : state.currentCat;
+          return {
+            cats: newCats,
+            currentCat: newCurrentCat,
+            isLoading: false,
+          };
+        });
       }
     } catch (error) {
       logError(error, 'updateCat');
@@ -83,9 +103,12 @@ export const useCatStore = create<CatState>((set, get) => ({
       await catRepository.delete(id);
       set((state) => {
         const newCats = state.cats.filter((c) => c.id !== id);
+        const newCurrentCatId = newCats.length > 0 ? newCats[0].id : null;
+        const newCurrentCat = newCats.find((c) => c.id === newCurrentCatId) || null;
         return {
           cats: newCats,
-          currentCatId: newCats.length > 0 ? newCats[0].id : null,
+          currentCatId: newCurrentCatId,
+          currentCat: newCurrentCat,
           isLoading: false,
         };
       });
@@ -96,7 +119,13 @@ export const useCatStore = create<CatState>((set, get) => ({
   },
 
   setCurrentCat: (id: string) => {
-    set({ currentCatId: id });
+    set((state) => {
+      const newCurrentCat = state.cats.find((c) => c.id === id) || null;
+      return {
+        currentCatId: id,
+        currentCat: newCurrentCat,
+      };
+    });
   },
 
   initializeData: async () => {
@@ -109,16 +138,22 @@ export const useCatStore = create<CatState>((set, get) => ({
       if (cats.length === 0) {
         await seedMockData();
         const seededCats = await catRepository.getAll();
+        const currentCatId = seededCats.length > 0 ? seededCats[0].id : null;
+        const currentCat = seededCats.find((c) => c.id === currentCatId) || null;
         set({
           cats: seededCats,
-          currentCatId: seededCats.length > 0 ? seededCats[0].id : null,
+          currentCatId,
+          currentCat,
           isLoading: false,
           isInitialized: true,
         });
       } else {
+        const currentCatId = cats.length > 0 ? cats[0].id : null;
+        const currentCat = cats.find((c) => c.id === currentCatId) || null;
         set({
           cats,
-          currentCatId: cats.length > 0 ? cats[0].id : null,
+          currentCatId,
+          currentCat,
           isLoading: false,
           isInitialized: true,
         });
@@ -129,3 +164,7 @@ export const useCatStore = create<CatState>((set, get) => ({
     }
   },
 }));
+
+export const useCurrentCat = () => useCatStore((state) => state.currentCat);
+export const useCurrentCatId = () => useCatStore((state) => state.currentCatId);
+export const useCats = () => useCatStore((state) => state.cats);

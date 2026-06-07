@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import type { WeightRecordInput } from '@/types';
 
 export const WeightChart: React.FC = () => {
-  const { currentCat, cats } = useCatStore();
+  const currentCat = useCatStore((state) => state.currentCat);
   const { weightRecords, addWeightRecord, isLoading } = useHealthStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [weightInput, setWeightInput] = useState('');

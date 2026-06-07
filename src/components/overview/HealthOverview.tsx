@@ -42,7 +42,7 @@ const StatCard: React.FC<{
 };
 
 export const HealthOverview: React.FC = () => {
-  const { currentCat } = useCatStore();
+  const currentCat = useCatStore((state) => state.currentCat);
   const { weightRecords, healthRecords, vaccineRecords, labResults, isLoading } = useHealthStore();
   const isOnline = useOfflineStatus();
   const analysis = useWeightAnalysis(currentCat || null, weightRecords);

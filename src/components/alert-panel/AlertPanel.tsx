@@ -179,7 +179,7 @@ const AlertItem: React.FC<{
 };
 
 export const AlertPanel: React.FC = () => {
-  const { currentCat } = useCatStore();
+  const currentCat = useCatStore((state) => state.currentCat);
   const { labResults, healthRecords, isLoading } = useHealthStore();
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
 

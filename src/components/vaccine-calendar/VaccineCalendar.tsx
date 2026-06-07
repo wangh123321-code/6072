@@ -32,8 +32,8 @@ const VACCINE_INTERVALS: Record<string, number> = {
 };
 
 export const VaccineCalendar: React.FC = () => {
-  const { currentCat } = useCatStore();
-  const { vaccineRecords, addVaccineRecord, getUpcomingVaccines, isLoading } = useHealthStore();
+  const currentCat = useCatStore((state) => state.currentCat);
+  const { vaccineRecords, addVaccineRecord, isLoading } = useHealthStore();
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
