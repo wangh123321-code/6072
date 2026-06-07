@@ -1,5 +1,20 @@
 import { getDB, generateId } from './index';
-import type { Cat, CatInput } from '../types';
+import type { Cat, CatInput, HealthRecord, WeightRecord, VaccineRecord, LabResult, Prescription } from '../types';
+
+export interface CatCompleteData {
+  cat: Cat;
+  healthRecords: HealthRecord[];
+  weightRecords: WeightRecord[];
+  vaccineRecords: VaccineRecord[];
+  labResults: LabResult[];
+  prescriptions: Prescription[];
+}
+
+export interface ExportData {
+  version: string;
+  exportedAt: string;
+  cats: CatCompleteData[];
+}
 
 export const catRepository = {
   async getAll(): Promise<Cat[]> {
@@ -67,5 +82,76 @@ export const catRepository = {
     }
     
     await tx.done;
+  },
+
+  async getCompleteCatData(catId: string): Promise<CatCompleteData | null> {
+    const db = await getDB();
+    
+    const cat = await db.get('cats', catId);
+    if (!cat) return null;
+
+    const [healthRecords, weightRecords, vaccineRecords] = await Promise.all([
+      db.getAllFromIndex('healthRecords', 'by-catId', catId),
+      db.getAllFromIndex('weightRecords', 'by-catId', catId),
+      db.getAllFromIndex('vaccineRecords', 'by-catId', catId),
+    ]);
+
+    const recordIds = healthRecords.map(r => r.id);
+    const labResults: LabResult[] = [];
+    const prescriptions: Prescription[] = [];
+
+    for (const recordId of recordIds) {
+      const [recordLabResults, recordPrescriptions] = await Promise.all([
+        db.getAllFromIndex('labResults', 'by-recordId', recordId),
+        db.getAllFromIndex('prescriptions', 'by-recordId', recordId),
+      ]);
+      labResults.push(...recordLabResults);
+      prescriptions.push(...recordPrescriptions);
+    }
+
+    return {
+      cat,
+      healthRecords,
+      weightRecords,
+      vaccineRecords,
+      labResults,
+      prescriptions,
+    };
+  },
+
+  async getAllCompleteData(): Promise<CatCompleteData[]> {
+    const cats = await this.getAll();
+    const completeData: CatCompleteData[] = [];
+
+    for (const cat of cats) {
+      const data = await this.getCompleteCatData(cat.id);
+      if (data) {
+        completeData.push(data);
+      }
+    }
+
+    return completeData;
+  },
+
+  async getExportData(catIds?: string[]): Promise<ExportData> {
+    let catsData: CatCompleteData[];
+
+    if (catIds && catIds.length > 0) {
+      catsData = [];
+      for (const id of catIds) {
+        const data = await this.getCompleteCatData(id);
+        if (data) {
+          catsData.push(data);
+        }
+      }
+    } else {
+      catsData = await this.getAllCompleteData();
+    }
+
+    return {
+      version: '1.0.0',
+      exportedAt: new Date().toISOString(),
+      cats: catsData,
+    };
   },
 };

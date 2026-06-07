@@ -6,6 +6,7 @@ export { Input, Select, Textarea } from './common/Input';
 export { Empty } from './Empty';
 
 export { CatSelector } from './cat-selector/CatSelector';
+export { ExportModal } from './export/ExportModal';
 export { HealthOverview } from './overview/HealthOverview';
 export { HealthTimeline } from './timeline/HealthTimeline';
 export { TimelineNode } from './timeline/TimelineNode';

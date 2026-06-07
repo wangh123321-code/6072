@@ -12,6 +12,9 @@ export function createMockData(): {
   const now = new Date();
   const cat1Id = generateId();
   const cat2Id = generateId();
+  const cat3Id = generateId();
+  const cat4Id = generateId();
+  const cat5Id = generateId();
 
   const cats: Cat[] = [
     {
@@ -31,6 +34,36 @@ export function createMockData(): {
       birthday: '2023-06-20',
       gender: 'female',
       avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20white%20ragdoll%20cat%20portrait%20blue%20eyes%20fluffy&image_size=square',
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    },
+    {
+      id: cat3Id,
+      name: '煤球',
+      breed: '中华田园猫',
+      birthday: '2021-11-05',
+      gender: 'male',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20black%20chinese%20garden%20cat%20portrait%20yellow%20eyes&image_size=square',
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    },
+    {
+      id: cat4Id,
+      name: '布丁',
+      breed: '美国短毛猫',
+      birthday: '2024-01-10',
+      gender: 'female',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20brown%20american%20shorthair%20cat%20tabby%20portrait&image_size=square',
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    },
+    {
+      id: cat5Id,
+      name: '奶茶',
+      breed: '暹罗猫',
+      birthday: '2023-09-18',
+      gender: 'female',
+      avatar: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20siamese%20cat%20portrait%20blue%20eyes&image_size=square',
       createdAt: now.toISOString(),
       updatedAt: now.toISOString(),
     },
@@ -232,6 +265,229 @@ export function createMockData(): {
         maxRange: ind.max,
         status,
       });
+    });
+  });
+
+  const baseDate3 = new Date('2022-03-01');
+  for (let i = 0; i < 8; i++) {
+    const date = new Date(baseDate3);
+    date.setMonth(date.getMonth() + i);
+    
+    const weight = 4.0 + i * 0.1 + (Math.random() - 0.5) * 0.2;
+    weightRecords.push({
+      id: generateId(),
+      catId: cat3Id,
+      date: date.toISOString().split('T')[0],
+      weight: Math.round(weight * 10) / 10,
+      source: i % 2 === 0 ? '医院体检' : '家用体重秤',
+      createdAt: now.toISOString(),
+    });
+  }
+
+  const checkupDates3 = ['2023-06-15', '2023-12-20', '2024-06-10'];
+  checkupDates3.forEach((date, idx) => {
+    const recordId = generateId();
+    healthRecords.push({
+      id: recordId,
+      catId: cat3Id,
+      date,
+      type: 'checkup',
+      hospital: '爱宠宠物医院',
+      doctor: '王医生',
+      title: '常规体检',
+      description: '年度健康检查。',
+      pdfUrl: '',
+      ocrText: '',
+      createdAt: now.toISOString(),
+    });
+
+    const indicators3 = [
+      { name: '白细胞计数 (WBC)', unit: '×10^9/L', min: 5.5, max: 19.5, base: 14 },
+      { name: '红细胞计数 (RBC)', unit: '×10^12/L', min: 5.0, max: 10.0, base: 8.0 },
+      { name: '血红蛋白 (HGB)', unit: 'g/L', min: 80, max: 150, base: 140 },
+      { name: '血小板计数 (PLT)', unit: '×10^9/L', min: 100, max: 500, base: 320 },
+    ];
+
+    indicators3.forEach((ind) => {
+      const value = ind.base + (Math.random() - 0.5) * ind.base * 0.1;
+      const status = value < ind.min ? 'low' : value > ind.max ? 'high' : 'normal';
+      
+      labResults.push({
+        id: generateId(),
+        recordId,
+        indicator: ind.name,
+        value: Math.round(value * 10) / 10,
+        unit: ind.unit,
+        minRange: ind.min,
+        maxRange: ind.max,
+        status,
+      });
+    });
+  });
+
+  const vaccineDates3 = [
+    { date: '2023-06-15', nextDate: '2024-06-15', name: '猫三联疫苗' },
+    { date: '2023-06-15', nextDate: '2024-06-15', name: '狂犬疫苗' },
+  ];
+  vaccineDates3.forEach((v) => {
+    vaccineRecords.push({
+      id: generateId(),
+      catId: cat3Id,
+      name: v.name,
+      date: v.date,
+      nextDate: v.nextDate,
+      hospital: '爱宠宠物医院',
+      batchNo: `BATCH${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+      createdAt: now.toISOString(),
+    });
+  });
+
+  const baseDate4 = new Date('2024-03-01');
+  for (let i = 0; i < 5; i++) {
+    const date = new Date(baseDate4);
+    date.setMonth(date.getMonth() + i);
+    
+    const weight = 1.2 + i * 0.3 + (Math.random() - 0.5) * 0.15;
+    weightRecords.push({
+      id: generateId(),
+      catId: cat4Id,
+      date: date.toISOString().split('T')[0],
+      weight: Math.round(weight * 10) / 10,
+      source: '家用体重秤',
+      createdAt: now.toISOString(),
+    });
+  }
+
+  const checkupDates4 = ['2024-04-10', '2024-07-15'];
+  checkupDates4.forEach((date, idx) => {
+    const recordId = generateId();
+    healthRecords.push({
+      id: recordId,
+      catId: cat4Id,
+      date,
+      type: 'checkup',
+      hospital: '萌宠宠物诊所',
+      doctor: '陈医生',
+      title: '幼猫体检',
+      description: '幼猫成长发育检查。',
+      pdfUrl: '',
+      ocrText: '',
+      createdAt: now.toISOString(),
+    });
+
+    const indicators4 = [
+      { name: '白细胞计数 (WBC)', unit: '×10^9/L', min: 5.5, max: 19.5, base: 11 },
+      { name: '红细胞计数 (RBC)', unit: '×10^12/L', min: 5.0, max: 10.0, base: 6.0 },
+      { name: '血红蛋白 (HGB)', unit: 'g/L', min: 80, max: 150, base: 100 },
+    ];
+
+    indicators4.forEach((ind) => {
+      const value = ind.base + (Math.random() - 0.5) * ind.base * 0.12;
+      const status = value < ind.min ? 'low' : value > ind.max ? 'high' : 'normal';
+      
+      labResults.push({
+        id: generateId(),
+        recordId,
+        indicator: ind.name,
+        value: Math.round(value * 10) / 10,
+        unit: ind.unit,
+        minRange: ind.min,
+        maxRange: ind.max,
+        status,
+      });
+    });
+  });
+
+  const vaccineDates4 = [
+    { date: '2024-04-10', nextDate: '2025-04-10', name: '猫三联疫苗' },
+    { date: '2024-04-10', nextDate: '2025-04-10', name: '狂犬疫苗' },
+    { date: '2024-07-15', nextDate: '2024-10-15', name: '体内外驱虫' },
+  ];
+  vaccineDates4.forEach((v) => {
+    vaccineRecords.push({
+      id: generateId(),
+      catId: cat4Id,
+      name: v.name,
+      date: v.date,
+      nextDate: v.nextDate,
+      hospital: '萌宠宠物诊所',
+      batchNo: `BATCH${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+      createdAt: now.toISOString(),
+    });
+  });
+
+  const baseDate5 = new Date('2023-12-01');
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(baseDate5);
+    date.setMonth(date.getMonth() + i);
+    
+    const weight = 2.0 + i * 0.25 + (Math.random() - 0.5) * 0.1;
+    weightRecords.push({
+      id: generateId(),
+      catId: cat5Id,
+      date: date.toISOString().split('T')[0],
+      weight: Math.round(weight * 10) / 10,
+      source: i % 3 === 0 ? '医院体检' : '家用体重秤',
+      createdAt: now.toISOString(),
+    });
+  }
+
+  const checkupDates5 = ['2024-03-20', '2024-06-25'];
+  checkupDates5.forEach((date, idx) => {
+    const recordId = generateId();
+    healthRecords.push({
+      id: recordId,
+      catId: cat5Id,
+      date,
+      type: 'checkup',
+      hospital: '爱宠宠物医院',
+      doctor: '李医生',
+      title: '常规体检',
+      description: '暹罗猫健康检查。',
+      pdfUrl: '',
+      ocrText: '',
+      createdAt: now.toISOString(),
+    });
+
+    const indicators5 = [
+      { name: '白细胞计数 (WBC)', unit: '×10^9/L', min: 5.5, max: 19.5, base: 10.5 },
+      { name: '红细胞计数 (RBC)', unit: '×10^12/L', min: 5.0, max: 10.0, base: 7.0 },
+      { name: '血红蛋白 (HGB)', unit: 'g/L', min: 80, max: 150, base: 120 },
+      { name: '血小板计数 (PLT)', unit: '×10^9/L', min: 100, max: 500, base: 300 },
+      { name: '谷丙转氨酶 (ALT)', unit: 'U/L', min: 10, max: 100, base: 40 },
+    ];
+
+    indicators5.forEach((ind) => {
+      const value = ind.base + (Math.random() - 0.5) * ind.base * 0.1;
+      const status = value < ind.min ? 'low' : value > ind.max ? 'high' : 'normal';
+      
+      labResults.push({
+        id: generateId(),
+        recordId,
+        indicator: ind.name,
+        value: Math.round(value * 10) / 10,
+        unit: ind.unit,
+        minRange: ind.min,
+        maxRange: ind.max,
+        status,
+      });
+    });
+  });
+
+  const vaccineDates5 = [
+    { date: '2024-03-20', nextDate: '2025-03-20', name: '猫三联疫苗' },
+    { date: '2024-03-20', nextDate: '2025-03-20', name: '狂犬疫苗' },
+  ];
+  vaccineDates5.forEach((v) => {
+    vaccineRecords.push({
+      id: generateId(),
+      catId: cat5Id,
+      name: v.name,
+      date: v.date,
+      nextDate: v.nextDate,
+      hospital: '爱宠宠物医院',
+      batchNo: `BATCH${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+      createdAt: now.toISOString(),
     });
   });
 
